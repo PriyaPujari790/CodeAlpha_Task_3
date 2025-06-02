@@ -1,0 +1,34 @@
+
+SQL> -- Step 1: Create the table WITHOUT auto-increment
+SQL> CREATE TABLE Reservation (
+  2      reservation_id NUMBER PRIMARY KEY,
+  3      customer_name VARCHAR2(100),
+  4      room_id NUMBER,
+  5      CONSTRAINT fk_room FOREIGN KEY (room_id) REFERENCES Room(room_id)
+  6  );
+
+Table created.
+
+SQL>
+SQL> -- Step 2: Create a sequence to generate new IDs
+SQL> CREATE SEQUENCE reservation_seq
+  2  START WITH 1
+  3  INCREMENT BY 1
+  4  NOCACHE
+  5  NOCYCLE;
+
+Sequence created.
+
+SQL>
+SQL> -- Step 3: Create a trigger to assign sequence value before insert
+SQL> CREATE OR REPLACE TRIGGER reservation_bir
+  2  BEFORE INSERT ON Reservation
+  3  FOR EACH ROW
+  4  BEGIN
+  5    IF :NEW.reservation_id IS NULL THEN
+  6      SELECT reservation_seq.NEXTVAL INTO :NEW.reservation_id FROM dual;
+  7    END IF;
+  8  END;
+  9  /
+
+Trigger created.
